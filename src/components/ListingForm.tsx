@@ -3,7 +3,7 @@ import Input from "./Input.tsx"
 
 interface NewListing {
     title: string;
-    preco: number | string;
+    price: number | string;
     isDonation: boolean;
     category: string;
     description: string;
@@ -23,7 +23,7 @@ function ListingForm() {
         
         const newListing: NewListing = {
             title,
-            preco: isDonation ? 0 : price,
+            price: isDonation ? 0 : price,
             isDonation,
             category,
             description

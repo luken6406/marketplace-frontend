@@ -3,7 +3,7 @@ import Listings from './components/pages/Listings';
 import Profile from './components/pages/Profile';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Navbar from './components/layout/Navbar';
 
 export default function App() {
 
