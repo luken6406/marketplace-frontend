@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-
 import CreateListing from './components/pages/CreateListing';
 import Listings from './components/pages/Listings';
 import Profile from './components/pages/Profile';

@@ -1,6 +1,20 @@
-function Input({text, value, name, placeholder, type, onChange, options = []}){
-    if(type === 'checkbox'){
-        return(
+import React from 'react';
+
+
+interface InputProps {
+    text?: string;
+    value?: string | number | boolean;
+    name?: string;
+    placeholder?: string;
+    type?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    options?: string[];
+}
+
+
+function Input({ text, value, name, placeholder, type, onChange, options = [] }: InputProps) {
+    if (type === 'checkbox') {
+        return (
             <div className='flex items-center py-1 gap-3.5'>
                 <label htmlFor={name}>{text}</label>
                 <input 
@@ -8,14 +22,13 @@ function Input({text, value, name, placeholder, type, onChange, options = []}){
                     placeholder={placeholder} 
                     type={type}
                     onChange={onChange}
-                >
-                </input>
+                />
             </div>
-        )
+        );
     }
 
-    if(type === 'select'){
-        return(
+    if (type === 'select') {
+        return (
             <div className='flex flex-col gap-1.5'>
                 <div>
                     <label htmlFor={name}>{text}</label>
@@ -24,7 +37,7 @@ function Input({text, value, name, placeholder, type, onChange, options = []}){
                     <select 
                         className="w-full p-2.5 border border-gray-300 rounded-lg bg-white"
                         name={name}
-                        value={value}
+                        value={value as string | number | undefined}
                         onChange={onChange}
                     >
                         <option value="">Selecione...</option>
@@ -34,28 +47,28 @@ function Input({text, value, name, placeholder, type, onChange, options = []}){
                     </select>
                 </div>
             </div>
-        )
+        );
     }
 
-    return(
+    return (
         <div className='flex flex-col gap-1.5'>
             <div>
-                <label 
-                    htmlFor={name}>
-                        {text}
+                <label htmlFor={name}>
+                    {text}
                 </label>
             </div>
             <div>
-                <input className="w-full p-2.5 border border-gray-300 rounded-lg "
+                <input 
+                    className="w-full p-2.5 border border-gray-300 rounded-lg"
                     name={name} 
-                    value={value}
+                    value={value as string | number | undefined}
                     placeholder={placeholder} 
                     type={type}
-                    onChange={onChange}>
-                </input>
+                    onChange={onChange}
+                />
             </div>
         </div>
-    )
+    );
 }
 
-export default Input
+export default Input;

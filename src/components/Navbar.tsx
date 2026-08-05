@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 function Navbar() {
   // Ajustamos o tamanho da fonte para ser menor no mobile e '2xl' em telas médias/grandes
-  const liClassName = 'text-base sm:text-lg md:text-2xl text-white font-semibold hover:text-[#749adb] transition-colors'
+  const liClassName: string = 'text-base sm:text-lg md:text-2xl text-white font-semibold hover:text-[#749adb] transition-colors'
 
   return (
     <nav className='bg-[#0d59db] p-4 sm:p-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0 shadow-lg shadow-black/25'>
