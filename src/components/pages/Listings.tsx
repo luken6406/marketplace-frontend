@@ -1,41 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Input from '../Input';
 
-// Interface para definir a estrutura de cada produto/anúncio
 import { CardProps } from '../ListingCard';
 import ListingCard from '../ListingCard';
-
-
-// Dados mockados para exibição inicial
-const MOCK_LISTINGS: CardProps[] = [
-  {
-    id: 1,
-    title: 'Livro de Cálculo 1 - Guidorizzi',
-    price: 45.0,
-    category: 'Livros',
-    isDonation: false,
-    description: 'Livro em ótimo estado de conservação, sem rasuras.',
-  },
-  {
-    id: 2,
-    title: 'Bolsa de Notebook Unifor',
-    price: 0,
-    category: 'Bolsas',
-    isDonation: true,
-    description: 'Bolsa acolchoada para notebook de até 15.6 polegadas.',
-  },
-  {
-    id: 3,
-    title: 'Calculadora Científica Casio',
-    price: 80.0,
-    category: 'Eletrônicos',
-    isDonation: false,
-    description: 'Funcionando perfeitamente, acompanha capa de proteção.',
-  },
-];
-
-
-    
+export const categories: string[] = ['Livros', 'Bolsas', 'Eletrônicos', 'Outros'];
 
 function Listings() {
 
@@ -43,27 +11,42 @@ function Listings() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
 
-  const categories: string[] = ['Livros', 'Bolsas', 'Eletrônicos', 'Outros'];
+  
 
-  const [fetchedListings, setFetchedListings] = useState<CardProps[]>([])
+  const [fetchedListings, setFetchedListings] = useState<CardProps[]>([]);
 
-    useEffect(() => {
+  useEffect(() => {
     fetch("http://localhost:3001/api/anuncios", {
-        method: 'GET',
+      method: 'GET',
     })
-        .then((res) => {
+      .then((res) => {
         if (!res.ok) {
-            throw new Error('Erro ao buscar anúncios');
+          throw new Error('Erro ao buscar anúncios');
         }
         return res.json();
-        })
-        .then((data: CardProps[]) => {
+      })
+      .then((data: CardProps[]) => {
         setFetchedListings(data);
-        })
-        .catch((error) => {
+      })
+      .catch((error) => {
         console.log(error);
-        });
-    }, []);
+      });
+  }, []);
+
+
+  const filteredListings = fetchedListings.filter((item) => {
+
+    const matchesSearch = search === '' || 
+      item.title.toLowerCase().includes(search.toLowerCase());
+
+    const matchesCategory = selectedCategory === '' || 
+      item.category === selectedCategory;
+
+    const matchesPrice = maxPrice === '' || 
+      item.price <= Number(maxPrice);
+
+    return matchesSearch && matchesCategory && matchesPrice;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -118,9 +101,15 @@ function Listings() {
         {/* Grade de Produtos */}
         <main className="flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {fetchedListings.map((props: CardProps) => (
+            {filteredListings.length > 0 ? (
+              filteredListings.map((props: CardProps) => (
                 <ListingCard key={props.id} {...props} />
-            ))}
+              ))
+            ) : (
+              <p className="col-span-full text-center text-gray-500 py-8">
+                Nenhum produto encontrado.
+              </p>
+            )}
           </div>
         </main>
       </div>

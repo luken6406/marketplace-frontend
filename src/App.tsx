@@ -1,23 +1,38 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import CreateListing from './components/pages/CreateListing';
 import Listings from './components/pages/Listings';
 import Profile from './components/pages/Profile';
-
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/pages/LoginScreen';
+import Register from './components/pages/RegisterScreen';
 import Navbar from './components/layout/Navbar';
 
+// Importação dos componentes de autenticação
+import { AuthProvider } from './auth/AuthContext';
+import { ProtectedRoute } from './auth/ProtectedRoute';
+
 export default function App() {
-
   return (
-    <Router>
-      <Navbar />
+    // 1. O AuthProvider envelopa toda a aplicação para compartilhar o estado do usuário
+    <AuthProvider>
+      <Router>
+        <Navbar />
 
-      <Routes>
+        <Routes>
+          {/* Rotas Públicas */}
+          <Route path="/" element={<Listings />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        <Route path='/home' element={<Listings />}/>
-        <Route path='/list' element={<CreateListing />}/>
-        <Route path='/profile' element={<Profile />}/>
+          {/* Rotas Protegidas (Exigem Login) */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/list" element={<CreateListing />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
 
-      </Routes>
-    </Router>
-  )
+          {/* Rota Padrão (Redireciona URLs inválidas para a Home) */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
