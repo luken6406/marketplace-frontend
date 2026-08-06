@@ -17,7 +17,9 @@ export function Register() {
 
   const { state } = useLocation();
 
+  const message = state?.message
 
+  const [showMessage, setShowMessage] = useState(Boolean(message))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +51,6 @@ export function Register() {
       setIsLoading(false);
     }
   };
-
-  const [showMessage, setShowMessage] = useState(true)
 
   useEffect(() => {
 

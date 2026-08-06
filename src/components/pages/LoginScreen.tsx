@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';// Ajuste o caminho se necessário
 
 export function Login() {
+  const navigate = useNavigate();
+  const {user} = useAuth();
+  useEffect(() => {
+    if(user){
+        navigate('/profile')
+    }
+  }, [user, navigate])
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -10,7 +18,7 @@ export function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
+  
   const { login } = useAuth(); // Importa a função do AuthContext
 
   const handleSubmit = async (e: React.FormEvent) => {

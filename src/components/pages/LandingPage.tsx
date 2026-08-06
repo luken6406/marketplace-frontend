@@ -19,7 +19,8 @@ const bannerSlides = [
     badge: "100% Universitário",
     image: "https://unifor.br/documents/20143/703914/alunos-campus-banner-desktop-foto-ares-soares.jpg/94be9ce8-ac7a-9e71-ef7e-8bda5fd6361b?t=1755791605275",
     ctaText: "Criar Conta Gratuitamente",
-    ctaLink: "#registro"
+    ctaLink: "register",
+    passOn: ""
   },
   {
     id: 2,
@@ -28,7 +29,8 @@ const bannerSlides = [
     badge: "Compra & Entrega Segura",
     image: "https://unifor.br/documents/20143/0/CREDITO_-_DA_FOTO_%28ARES_SOARES%29_-_1%20%281%29.jpg/8c247ead-33f7-ffc4-a4e9-736dc3c4f433?version=1.0&t=1782420122279",
     ctaText: "Anuncie Grátis Agora",
-    ctaLink: "#anunciar"
+    ctaLink: "register",
+    passOn: "Crie sua conta para anunciar"
   },
   {
     id: 3,
@@ -37,7 +39,8 @@ const bannerSlides = [
     badge: "Economia Circular",
     image: "https://unifor.br/documents/20143/418852/entrada+da+biblioteca+da+unifor_ares+soares_%28800%29.jpg/8bd5b1f1-74a7-8c41-1303-b69ad6d12ac9?t=1564768675717",
     ctaText: "Ver Livros Disponíveis",
-    ctaLink: "#livros"
+    ctaLink: "listings",
+    passOn: "Livros"
   },
   {
     id: 4,
@@ -46,7 +49,8 @@ const bannerSlides = [
     badge: "Tecnologia & Gadgets",
     image: "https://tudorondonia.com/uploads/31-05-23-tbrdsqsus07piqi.jpg",
     ctaText: "Explorar Eletrônicos",
-    ctaLink: "#eletronicos"
+    ctaLink: "listings",
+    passOn: "Eletrônicos"
   }
 ];
 
@@ -186,15 +190,21 @@ export const LandingPage: React.FC = () => {
                 </p>
                 
                 <div className="pt-2 flex flex-wrap gap-4">
-                  <a
-                    href={slide.ctaLink}
+                  <button
+                    onClick={() => {
+                        navigate(`/${slide.ctaLink}`, {
+                            state:{
+                                message: slide.passOn
+                            }
+                        })
+                    }}
                     className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2"
                   >
                     {slide.ctaText}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
-                  </a>
+                  </button>
                   {isInstallable && (
                     <button
                       onClick={handleInstallClick}

@@ -7,6 +7,13 @@ function Profile() {
   const [myListings, setMyListings] = useState<CardProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Função para remover o item do estado local após o DELETE bem-sucedido
+  const handleDeleteSuccess = (deletedId: string | number) => {
+    setMyListings((prevListings) =>
+      prevListings.filter((item) => item.id !== deletedId)
+    );
+  };
+
   // Busca os anúncios vinculados ao ID do usuário
   useEffect(() => {
     async function fetchMyListings() {
@@ -80,7 +87,12 @@ function Profile() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {myListings.map((listing) => (
-                <ListingCard key={listing.id} {...listing} />
+                <ListingCard 
+                  key={listing.id} 
+                  {...listing} 
+                  showDelete={true}
+                  onDeleteSuccess={handleDeleteSuccess}
+                />
               ))}
             </div>
           )}

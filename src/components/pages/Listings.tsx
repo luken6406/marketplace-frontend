@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Input from '../Input';
 import ListingCard, { CardProps } from '../ListingCard';
+import { useLocation } from 'react-router-dom';
 
 export const categories: string[] = ['Livros', 'Bolsas', 'Eletrônicos', 'Outros'];
 
@@ -19,7 +20,18 @@ function Listings({ limit, showFilters = true }: ListingsProps) {
   const [fetchedListings, setFetchedListings] = useState<CardProps[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const { state } = useLocation();
+  const passedCategories = state?.message;
+
+  const handlePassedCategories = (cat: string) => {
+    setSelectedCategory(cat);
+  }
+
   useEffect(() => {
+    
+    if(state){
+        handlePassedCategories(passedCategories);
+    }
     // Usa a variável de ambiente se configurada, caso contrário fallback para localhost
     const apiUrl = import.meta.env.REACT_APP_API_URL || 'http://localhost:3001';
 

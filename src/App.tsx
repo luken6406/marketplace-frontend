@@ -6,6 +6,7 @@ import Login from './components/pages/LoginScreen';
 import Register from './components/pages/RegisterScreen';
 import Navbar from './components/layout/Navbar';
 import LandingPage from './components/pages/LandingPage';
+import ListingPage from './components/pages/ListingPage';
 
 // Importação dos componentes de autenticação
 import { AuthProvider } from './auth/AuthContext';
@@ -22,7 +23,10 @@ export default function App() {
         <Routes>
           {/* Rotas Públicas */}
           <Route path="/" element={<LandingPage />} />
+
           <Route path="/listings" element={<Listings />} />
+          <Route path="/listings/:id" element={<ListingPage />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
