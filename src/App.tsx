@@ -12,36 +12,58 @@ import ListingPage from './components/pages/ListingPage';
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import Footer from './components/layout/Footer';
+import ChatWidget from './components/chat/ChatWidget';
+import { ChatProvider, useChat } from './components/chat/ChatContext';
 
-export default function App() {
+
+function MainApp() {
+  const { activeContact, closeChat } = useChat();
+
   return (
-    // 1. O AuthProvider envelopa toda a aplicação para compartilhar o estado do usuário
-    <AuthProvider>
-      <Router>
-        <Navbar />
+    
+      <AuthProvider>
+        <Router>
+          <Navbar />
 
-        <Routes>
-          {/* Rotas Públicas */}
-          <Route path="/" element={<LandingPage />} />
+          <Routes>
+            {/* Rotas Públicas */}
+            <Route path="/" element={<LandingPage />} />
 
-          <Route path="/listings" element={<Listings />} />
-          <Route path="/listings/:id" element={<ListingPage />} />
+            <Route path="/listings" element={<Listings />} />
+            <Route path="/listings/:id" element={<ListingPage />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Rotas Protegidas (Exigem Login) */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/list" element={<CreateListing />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+            {/* Rotas Protegidas (Exigem Login) */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/list" element={<CreateListing />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
 
-          {/* Rota Padrão (Redireciona URLs inválidas para a Home) */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Rota Padrão (Redireciona URLs inválidas para a Home) */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
 
-        <Footer />
-      </Router>
-    </AuthProvider>
+          <ChatWidget 
+            activeContactId={activeContact?.id}
+            activeContactName={activeContact?.name}
+            onClose={closeChat}
+          />
+
+          <Footer />
+        </Router>
+      </AuthProvider>
+    
   );
 }
+
+export function App(){
+  return(
+  <ChatProvider>
+      <MainApp />
+  </ChatProvider>
+  )
+} 
+
+export default App

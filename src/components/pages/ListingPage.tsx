@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import { useChat } from '../chat/ChatContext';
+
 interface ListingDetail {
   id: number;
   title: string;
@@ -15,6 +17,8 @@ interface ListingDetail {
 }
 
 export function ListingPage() {
+  const { openChatWith } = useChat()
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -203,12 +207,17 @@ export function ListingPage() {
                 </div>
               </div>
 
-              <a
-                href={`mailto:${listing.userEmail || ''}?subject=Interesse no anúncio: ${listing.title}`}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2.5 rounded-xl border border-gray-300 transition-colors text-sm text-center"
-              >
+              <button
+                type="button"
+                onClick={() => {
+                    if (listing.userId && listing.userName) {
+                    openChatWith(listing.userId, listing.userName);
+                    }
+                }}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2.5 rounded-xl border border-gray-300 transition-colors text-sm text-center cursor-pointer"
+                >
                 Mensagem
-              </a>
+                </button>
             </div>
 
           </div>

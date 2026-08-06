@@ -363,7 +363,7 @@ export const LandingPage: React.FC = () => {
 
                 <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <button
-                    onClick={() => navigate('/criar-anuncio')}
+                    onClick={() => navigate('/list')}
                     className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg px-8 py-4 rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
                 >
                     + Anunciar Novo Item
