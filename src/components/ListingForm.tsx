@@ -51,8 +51,7 @@ function ListingForm() {
         throw new Error('Erro ao salvar');
       }
 
-      alert("Anúncio cadastrado com sucesso!");
-      navigate('/'); // Redireciona para a listagem
+      navigate('/listings'); // Redireciona para a listagem
     } catch (error) {
       if (error instanceof Error) {
         console.log('Erro na requisição:', error.message);

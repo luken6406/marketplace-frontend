@@ -5,10 +5,12 @@ import Profile from './components/pages/Profile';
 import Login from './components/pages/LoginScreen';
 import Register from './components/pages/RegisterScreen';
 import Navbar from './components/layout/Navbar';
+import LandingPage from './components/pages/LandingPage';
 
 // Importação dos componentes de autenticação
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
+import Footer from './components/layout/Footer';
 
 export default function App() {
   return (
@@ -19,7 +21,8 @@ export default function App() {
 
         <Routes>
           {/* Rotas Públicas */}
-          <Route path="/" element={<Listings />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/listings" element={<Listings />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -32,6 +35,8 @@ export default function App() {
           {/* Rota Padrão (Redireciona URLs inválidas para a Home) */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+
+        <Footer />
       </Router>
     </AuthProvider>
   );

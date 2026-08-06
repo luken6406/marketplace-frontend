@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 export function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cpf, setCpf] = useState('');
+  const [matricula, setMatricula] = useState('');
 
   // Estados para feedback visual de erro e carregamento
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const { state } = useLocation();
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +31,7 @@ export function Register() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password, cpf }),
+        body: JSON.stringify({ name, email, password, cpf, matricula }),
       });
 
       const data = await response.json();
@@ -44,8 +50,26 @@ export function Register() {
     }
   };
 
+  const [showMessage, setShowMessage] = useState(true)
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+        setShowMessage(false);
+        console.log("setting timer false")
+    }, 3000);
+
+    return () => clearTimeout(timer)
+
+  }, [])
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
+
+
+        {showMessage && <div className='bg-green-100 py-2 px-4 border border-green-300 rounded-lg m-5 text-green-700'>
+            {state.message}
+        </div>}
       <div className="max-w-md w-full bg-white rounded-lg border border-gray-200 shadow-sm p-8">
         
         {/* Cabeçalho */}
@@ -93,6 +117,20 @@ export function Register() {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Matrícula
+            </label>
+            <input
+              type="text"
+              required
+              value={matricula}
+              onChange={(e) => setMatricula(e.target.value)}
+              placeholder="00000000"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
               E-mail
             </label>
             <input
@@ -114,7 +152,7 @@ export function Register() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Sua Senha"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>

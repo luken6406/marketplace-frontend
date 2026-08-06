@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+
+@import url('https://fonts.google.com/specimen/Open+Sans');
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: rgb(78, 78, 78);
+}
 html, body {
   margin: 0;
   padding: 0;
