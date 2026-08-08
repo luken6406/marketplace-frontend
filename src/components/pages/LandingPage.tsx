@@ -4,14 +4,13 @@ import { categories } from './Listings';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-
 import { useAuth } from '../../auth/AuthContext';
+import { firstListingMessage } from '../layout/Navbar';
 
-
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // Dados dos banners centrais (Marketplace, Compra Segura, Comunidade Unifor, etc)
 const bannerSlides = [
-
   {
     id: 1,
     title: "O Marketplace Oficial dos Estudantes Unifor",
@@ -54,22 +53,17 @@ const bannerSlides = [
   }
 ];
 
-
-import { firstListingMessage } from '../layout/Navbar';
-
 export const LandingPage: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-    const {user} = useAuth();
-
-    const navigate = useNavigate();
-
-    const goToRegisterScreen = (message: string) => {
-        navigate('/register', {
-            state:{
-                message: message
-            }
-        })
-    }
+  const goToRegisterScreen = (message: string) => {
+    navigate('/register', {
+      state: {
+        message: message
+      }
+    });
+  };
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [listings, setListings] = useState<CardProps[]>([]);
@@ -105,8 +99,7 @@ export const LandingPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const apiUrl = import.meta.env.REACT_APP_API_URL || 'http://localhost:3001';
-    fetch(`${apiUrl}/api/anuncios`)
+    fetch(`${API_URL}/api/anuncios`)
       .then((res) => res.json())
       .then((data: CardProps[]) => {
         if (Array.isArray(data) && data.length > 0) {
@@ -126,48 +119,10 @@ export const LandingPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-
-
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
       
-      {/* 1. Header / Navbar 
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center text-xl shadow-md">
-              D
-            </div>
-            <div>
-              <span className="text-xl font-extrabold text-blue-900 tracking-tight">Desapego</span>
-              <span className="text-xl font-bold text-blue-600 ml-1">Unifor</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {isInstallable && (
-              <button
-                onClick={handleInstallClick}
-                className="hidden sm:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Instalar App
-              </button>
-            )}
-            <a
-              href="#anunciar"
-              className="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-md hover:shadow-lg"
-            >
-              Criar Anúncio Grátis
-            </a>
-          </div>
-        </div>
-      </header>
-      */}
-
-      {/* 2. Banner Central Rotativo (Hero Section com 4 Destaques) */}
+      {/* Banner Central Rotativo (Hero Section com 4 Destaques) */}
       <section className="relative bg-slate-900 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto min-h-[480px] md:min-h-[520px] flex items-center relative">
           {bannerSlides.map((slide, index) => (
@@ -192,13 +147,13 @@ export const LandingPage: React.FC = () => {
                 <div className="pt-2 flex flex-wrap gap-4">
                   <button
                     onClick={() => {
-                        navigate(`/${slide.ctaLink}`, {
-                            state:{
-                                message: slide.passOn
-                            }
-                        })
+                      navigate(`/${slide.ctaLink}`, {
+                        state: {
+                          message: slide.passOn
+                        }
+                      });
                     }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center gap-2 cursor-pointer"
                   >
                     {slide.ctaText}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +163,7 @@ export const LandingPage: React.FC = () => {
                   {isInstallable && (
                     <button
                       onClick={handleInstallClick}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-5 py-3 rounded-xl transition-all"
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-5 py-3 rounded-xl transition-all cursor-pointer"
                     >
                       Baixar como PWA
                     </button>
@@ -235,7 +190,7 @@ export const LandingPage: React.FC = () => {
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
+              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                 idx === currentSlide ? 'w-8 bg-blue-500' : 'w-2.5 bg-slate-600 hover:bg-slate-400'
               }`}
               aria-label={`Ir para banner ${idx + 1}`}
@@ -244,7 +199,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Banner Informativo de Benefícios (Marketplace & Segurança) */}
+      {/* Banner Informativo de Benefícios */}
       <section className="bg-white border-b border-slate-200 py-8">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
@@ -285,7 +240,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Seção de Anúncios Reutilizando o ListingCard por Categorias */}
+      {/* Seção de Anúncios Reutilizando o ListingCard por Categorias */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Anúncios Recentes no Campus</h2>
@@ -321,55 +276,54 @@ export const LandingPage: React.FC = () => {
         })}
       </section>
 
-      {/* 5. Banner de Call to Action (CTA Principal) */}
-      
+      {/* Banner de Call to Action (CTA Principal) */}
       {!user ? (
         <section id="anunciar" className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-16 px-4">
-            <div className="max-w-5xl mx-auto text-center space-y-6">
+          <div className="max-w-5xl mx-auto text-center space-y-6">
             <span className="bg-blue-400/20 text-blue-200 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                Faça Parte da Comunidade
+              Faça Parte da Comunidade
             </span>
             <h2 className="text-3xl md:text-5xl font-black leading-tight">
-                Tem algo parado no armário que pode ser útil para outro aluno?
+              Tem algo parado no armário que pode ser útil para outro aluno?
             </h2>
             <p className="text-blue-100 text-base md:text-xl max-w-2xl mx-auto">
-                Crie seu anúncio em menos de 2 minutos. É totalmente grátis e você combina a entrega diretamente no campus.
+              Crie seu anúncio em menos de 2 minutos. É totalmente grátis e você combina a entrega diretamente no campus.
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button
+              <button
                 onClick={() => {
-                    goToRegisterScreen(firstListingMessage)
+                  goToRegisterScreen(firstListingMessage);
                 }}
-                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg px-8 py-4 rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5"
-                >
+                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg px-8 py-4 rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
+              >
                 Crie Seu Primeiro Anúncio Grátis!
-                </button>
+              </button>
             </div>
-            </div>
+          </div>
         </section>
       ) : (
         <section id="anunciar" className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white py-16 px-4">
-            <div className="max-w-5xl mx-auto text-center space-y-6">
-                <span className="bg-blue-400/20 text-blue-200 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                Desapegue Agora
-                </span>
-                <h2 className="text-3xl md:text-5xl font-black leading-tight">
-                Pronto para liberar espaço no armário?
-                </h2>
-                <p className="text-blue-100 text-base md:text-xl max-w-2xl mx-auto">
-                Publique seu item em menos de 2 minutos e combine a entrega diretamente com outros alunos no campus.
-                </p>
+          <div className="max-w-5xl mx-auto text-center space-y-6">
+            <span className="bg-blue-400/20 text-blue-200 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+              Desapegue Agora
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black leading-tight">
+              Pronto para liberar espaço no armário?
+            </h2>
+            <p className="text-blue-100 text-base md:text-xl max-w-2xl mx-auto">
+              Publique seu item em menos de 2 minutos e combine a entrega diretamente com outros alunos no campus.
+            </p>
 
-                <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button
-                    onClick={() => navigate('/list')}
-                    className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg px-8 py-4 rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
-                >
-                    + Anunciar Novo Item
-                </button>
-                </div>
+            <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={() => navigate('/list')}
+                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-lg px-8 py-4 rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
+              >
+                + Anunciar Novo Item
+              </button>
             </div>
+          </div>
         </section>
       )}
 

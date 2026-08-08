@@ -1,27 +1,29 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 export interface CardProps {
     id: string | number,
     title: string,
-    imageUrl?: string,
+    imgURL?: string,
     category: string,
     description?: string,
     isDonation: boolean,
     price: number,
-    showDelete?: boolean,
+    showOptions?: boolean,
     onDeleteSuccess?: (id: string | number) => void
 }
 
 function ListingCard({
     id, 
     title, 
-    imageUrl, 
+    imgURL, 
     category, 
     description, 
     isDonation, 
     price, 
-    showDelete = false, 
+    showOptions = false, 
     onDeleteSuccess 
 }: CardProps) {
     const navigate = useNavigate();
@@ -34,7 +36,7 @@ function ListingCard({
         setIsDeleting(true);
 
         try {
-            const response = await fetch(`http://localhost:3001/api/anuncios/${id}`, {
+            const response = await fetch(`${API_URL}/api/anuncios/${id}`, {
                 method: 'DELETE',
             });
 
@@ -62,8 +64,8 @@ function ListingCard({
         >
             {/* Imagem Placeholder */}
             <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
-                {imageUrl ? (
-                    <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+                {imgURL ? (
+                    <img src={imgURL} alt={title} className="w-full h-full object-contain" />
                 ) : (
                     <span className="text-sm font-medium">Sem Imagem</span>
                 )}
@@ -88,47 +90,67 @@ function ListingCard({
                         </span>
                     )}
 
-                    {/* Área de Remoção */}
-                    {showDelete && (
-                        <div>
-                            {!isConfirming ? (
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsConfirming(true);
-                                    }}
-                                    className="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-md transition-colors"
-                                >
-                                    Remover
-                                </button>
-                            ) : (
-                                <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                                    <span className="text-xs text-gray-500 font-medium mr-1">Certeza?</span>
+                    {/* Ações do Card */}
+                    <div className="flex items-center gap-2">
+                        {showOptions && (
+                            <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/list', {
+                                    state: {
+                                        initialData: { id, title, imgURL, category, description, isDonation, price },
+                                        method: 'PUT'
+                                    }
+                                });
+                            }}
+                            className="text-xs font-semibold text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer"
+                        >
+                            Editar
+                        </button>
+                        )}
+
+                        {/* Área de Remoção */}
+                        {showOptions && (
+                            <div>
+                                {!isConfirming ? (
                                     <button
                                         type="button"
-                                        disabled={isDeleting}
-                                        onClick={handleDelete}
-                                        className="text-xs font-bold text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded transition-colors disabled:opacity-50"
-                                    >
-                                        {isDeleting ? '...' : 'Sim'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        disabled={isDeleting}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setIsConfirming(false);
+                                            setIsConfirming(true);
                                         }}
-                                        className="text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                                        className="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-md transition-colors"
                                     >
-                                        Não
+                                        Remover
                                     </button>
-                                </div>
-                            )}
-                        </div>
-                        
-                    )}
+                                ) : (
+                                    <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                        <span className="text-xs text-gray-500 font-medium mr-1">Certeza?</span>
+                                        <button
+                                            type="button"
+                                            disabled={isDeleting}
+                                            onClick={handleDelete}
+                                            className="text-xs font-bold text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded transition-colors disabled:opacity-50"
+                                        >
+                                            {isDeleting ? '...' : 'Sim'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={isDeleting}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setIsConfirming(false);
+                                            }}
+                                            className="text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                                        >
+                                            Não
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -8,12 +8,13 @@ import Navbar from './components/layout/Navbar';
 import LandingPage from './components/pages/LandingPage';
 import ListingPage from './components/pages/ListingPage';
 
-// Importação dos componentes de autenticação
 import { AuthProvider } from './auth/AuthContext';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import Footer from './components/layout/Footer';
 import ChatWidget from './components/chat/ChatWidget';
 import { ChatProvider, useChat } from './components/chat/ChatContext';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 
 function MainApp() {
@@ -26,7 +27,6 @@ function MainApp() {
           <Navbar />
 
           <Routes>
-            {/* Rotas Públicas */}
             <Route path="/" element={<LandingPage />} />
 
             <Route path="/listings" element={<Listings />} />
@@ -35,13 +35,11 @@ function MainApp() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* Rotas Protegidas (Exigem Login) */}
             <Route element={<ProtectedRoute />}>
               <Route path="/list" element={<CreateListing />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 
-            {/* Rota Padrão (Redireciona URLs inválidas para a Home) */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
 

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';// Ajuste o caminho se necessário
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 export function Login() {
   const navigate = useNavigate();
   const {user} = useAuth();
@@ -27,7 +29,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/login', {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

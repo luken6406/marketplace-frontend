@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import ListingCard, { CardProps } from '../ListingCard';
 import { useAuth } from '../../auth/AuthContext'; // Ajuste o caminho do import conforme seu projeto
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 function Profile() {
   const { user } = useAuth(); // Pega os dados do usuário logado
   const [myListings, setMyListings] = useState<CardProps[]>([]);
@@ -20,7 +22,7 @@ function Profile() {
       if (!user?.id) return;
 
       try {
-        const response = await fetch(`http://localhost:3001/api/anuncios?userId=${user.id}`);
+        const response = await fetch(`${API_URL}/api/anuncios?userId=${user.id}`);
         if (response.ok) {
           const data = await response.json();
           setMyListings(data);
@@ -36,7 +38,7 @@ function Profile() {
   }, [user]);
 
   if (!user) {
-    return null; // O ProtectedRoute já trata o redirecionamento
+    return null; 
   }
 
   return (
@@ -66,6 +68,11 @@ function Profile() {
               <span className="block text-xs font-semibold text-gray-400 uppercase">CPF</span>
               <p className="font-medium">{user.cpf}</p>
             </div>
+
+            <div>
+              <span className="block text-xs font-semibold text-gray-400 uppercase">CEP</span>
+              <p className="font-medium">{user.cep}</p>
+            </div>
           </div>
         </aside>
 
@@ -90,7 +97,7 @@ function Profile() {
                 <ListingCard 
                   key={listing.id} 
                   {...listing} 
-                  showDelete={true}
+                  showOptions={true}
                   onDeleteSuccess={handleDeleteSuccess}
                 />
               ))}

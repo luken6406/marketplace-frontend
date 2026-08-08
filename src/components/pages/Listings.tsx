@@ -5,6 +5,8 @@ import { useLocation } from 'react-router-dom';
 
 export const categories: string[] = ['Livros', 'Bolsas', 'Eletrônicos', 'Outros'];
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 interface ListingsProps {
   /** Quantidade máxima de anúncios a serem exibidos (útil para a Landing Page) */
   limit?: number;
@@ -32,11 +34,9 @@ function Listings({ limit, showFilters = true }: ListingsProps) {
     if(state){
         handlePassedCategories(passedCategories);
     }
-    // Usa a variável de ambiente se configurada, caso contrário fallback para localhost
-    const apiUrl = import.meta.env.REACT_APP_API_URL || 'http://localhost:3001';
 
     setLoading(true);
-    fetch(`${apiUrl}/api/anuncios`, {
+    fetch(`${API_URL}/api/anuncios`, {
       method: 'GET',
     })
       .then((res) => {

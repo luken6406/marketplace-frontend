@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import ErrorCard from '../ErrorCard.tsx'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cpf, setCpf] = useState('');
+  const [cep, setCep] = useState('');
   const [matricula, setMatricula] = useState('');
 
-  // Estados para feedback visual de erro e carregamento
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,19 +30,17 @@ export function Register() {
     setIsLoading(true);
 
     try {
-      // Requisição POST para a rota de cadastro no backend
-      const response = await fetch('http://localhost:3001/api/register', {
+      const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password, cpf, matricula }),
+        body: JSON.stringify({ name, email, password, cpf, cep, matricula }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // Se o backend retornar status de erro (ex: 400), lança a mensagem enviada
         throw new Error(data.error || 'Erro ao realizar cadastro.');
       }
 
@@ -67,9 +68,7 @@ export function Register() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
 
 
-        {showMessage && <div className='bg-green-100 py-2 px-4 border border-green-300 rounded-lg m-5 text-green-700'>
-            {state.message}
-        </div>}
+        {showMessage && <ErrorCard msg={state.message}/>}
       <div className="max-w-md w-full bg-white rounded-lg border border-gray-200 shadow-sm p-8">
         
         {/* Cabeçalho */}
@@ -111,6 +110,20 @@ export function Register() {
               value={cpf}
               onChange={(e) => setCpf(e.target.value)}
               placeholder="000.000.000-00"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              CEP
+            </label>
+            <input
+              type="text"
+              required
+              value={cep}
+              onChange={(e) => setCep(e.target.value)}
+              placeholder="00000000"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>

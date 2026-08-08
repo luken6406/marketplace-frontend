@@ -3,21 +3,28 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { useChat } from '../chat/ChatContext';
 
+import ErrorCard from '../ErrorCard.tsx';
+import { FreteCard, OpcaoFrete } from '../FreteCard.tsx';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 interface ListingDetail {
   id: number;
   title: string;
+  imgURL: string;
   category: string;
   price: number;
   isDonation: boolean;
   description: string;
   userId: number;
+  userCEP: string;
   userName?: string;
   userEmail?: string;
   userAvatarUrl?: string; // Opcional, para quando tiver avatar no backend
 }
 
 export function ListingPage() {
-  const { openChatWith } = useChat()
+  const { openChatWith } = useChat();
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -28,10 +35,76 @@ export function ListingPage() {
   const [freteResult, setFreteResult] = useState<string | null>(null);
   const [isBuying, setIsBuying] = useState<boolean>(false);
 
+  const [freteError, setFreteError] = useState<string>('');
+  const [opcoesFrete, setOpcoesFrete] = useState<OpcaoFrete[]>([]);
+  const [selectedFreteId, setSelectedFreteId] = useState<number | null>(null);
+
+  async function getFrete(cepDestinoDigitado: string) {
+    console.log("rodando getFrete()");
+    if (!listing?.userCEP) {
+      setFreteError('CEP do anunciante não encontrado.');
+      return;
+    } 
+    
+    try {
+      const response = await fetch(`${API_URL}/api/frete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cepOrigem: listing.userCEP, // CEP de origem (ex: vendedor)
+          cepDestino: cepDestinoDigitado, // CEP de destino inserido pelo usuário
+          produtos: [
+            { 
+              id: '1', 
+              width: 15, 
+              height: 10, 
+              length: 20, 
+              weight: 0.5, 
+              insurance_value: 100, 
+              quantity: 1 
+            }
+          ]
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setFreteError(data.message || 'Erro ao calcular frete');
+        setOpcoesFrete([]);
+        setTimeout(() => {
+          setFreteError('');
+        }, 3000);
+      } else {
+        if (Array.isArray(data)) {
+          const opcoesValidas = data.filter((option) => !option.error);
+
+          if (opcoesValidas.length === 0) {
+            setFreteError('Não há opções de entrega disponíveis para esse endereço');
+            setOpcoesFrete([]);
+            setTimeout(() => {
+              setFreteError('');
+            }, 4000);
+          } else {
+            setOpcoesFrete(data);
+          }
+        }
+      }
+    } catch (error) {
+      setFreteError('Erro ao se conectar ao serviço de frete.');
+      setOpcoesFrete([]);
+      setTimeout(() => {
+        setFreteError('');
+      }, 3000);
+    }
+  }
+
   useEffect(() => {
     async function fetchListingDetail() {
       try {
-        const response = await fetch(`http://localhost:3001/api/anuncios/${id}`);
+        const response = await fetch(`${API_URL}/api/anuncios/${id}`);
         if (!response.ok) {
           throw new Error('Anúncio não encontrado');
         }
@@ -49,8 +122,21 @@ export function ListingPage() {
 
   const handleCalculateFrete = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cep) return;
-    setFreteResult('Entrega Grátis no Campus Unifor (Ponto de Encontro)');
+    
+    // Remove qualquer caractere que não seja número
+    const cleanCep = cep.replace(/\D/g, '');
+
+    // Verifica se possui exatamente 8 números
+    if (cleanCep.length !== 8) {
+      setFreteError('Digite um CEP valido');
+      setOpcoesFrete([]);
+      setTimeout(() => {
+        setFreteError('');
+      }, 3000);
+      return;
+    }
+
+    getFrete(cleanCep);
   };
 
   const handleBuy = async () => {
@@ -101,7 +187,11 @@ export function ListingPage() {
           {/* Coluna Esquerda: Imagem do Produto */}
           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-96 md:h-[450px]">
             <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-              <span className="text-base font-medium">Imagem do Produto</span>
+              {listing.imgURL ? (
+                <img className="w-full h-full object-contain" src={listing.imgURL} alt={listing.title} />
+              ) : (
+                <span>Produto sem imagem</span>
+              )}
             </div>
           </div>
 
@@ -154,7 +244,11 @@ export function ListingPage() {
 
             {/* Seção de Frete / Entrega */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
-              <h3 className="text-sm font-semibold text-gray-700 uppercase">Simular Entrega</h3>
+              <div className='flex flex-row items-center justify-between gap-4'>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase">Simular Entrega</h3>
+                {freteError.length > 0 && <ErrorCard msg={freteError} />}
+              </div>
+              
               <form onSubmit={handleCalculateFrete} className="flex gap-2">
                 <input
                   type="text"
@@ -170,10 +264,35 @@ export function ListingPage() {
                   Calcular
                 </button>
               </form>
+
+              {/* Aviso de Entrega Direta / Ponto de Encontro */}
+              <p className="text-xs text-gray-500 flex items-center gap-1.5 pt-1">
+                <span>📍</span> Ou você pode combinar a entrega no campus com o vendedor :)
+              </p>
+
               {freteResult && (
                 <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
                   {freteResult}
                 </p>
+              )}
+
+              {/* Renderização Condicional da Lista de Opções de Frete */}
+              {opcoesFrete.length > 0 && (
+                <div className="pt-3 border-t border-gray-100 space-y-2">
+                  <span className="text-xs font-semibold text-gray-500 block uppercase mb-1">
+                    Opções de envio disponíveis:
+                  </span>
+                  {opcoesFrete
+                    .filter((option) => !option.error)
+                    .map((option) => (
+                      <FreteCard
+                        key={option.id}
+                        frete={option}
+                        isSelected={selectedFreteId === option.id}
+                        onSelect={(frete) => setSelectedFreteId(frete.id)}
+                      />
+                    ))}
+                </div>
               )}
             </div>
 
@@ -210,14 +329,14 @@ export function ListingPage() {
               <button
                 type="button"
                 onClick={() => {
-                    if (listing.userId && listing.userName) {
+                  if (listing.userId && listing.userName) {
                     openChatWith(listing.userId, listing.userName);
-                    }
+                  }
                 }}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2.5 rounded-xl border border-gray-300 transition-colors text-sm text-center cursor-pointer"
-                >
+              >
                 Mensagem
-                </button>
+              </button>
             </div>
 
           </div>

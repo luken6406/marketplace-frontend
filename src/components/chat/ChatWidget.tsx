@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../../auth/AuthContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 interface Message {
   id: number;
   senderId: number;
@@ -33,7 +35,6 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
 
   const isSelfChat = selectedContact?.id === user?.id;
 
-  // Define contato ativo vindo por props (ex: quando clica em "Mensagem" na ListingPage)
   useEffect(() => {
     if (activeContactId && activeContactName) {
       setSelectedContact({ id: activeContactId, name: activeContactName, email: '' });
@@ -41,13 +42,12 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
     }
   }, [activeContactId, activeContactName]);
 
-  // Carrega lista de contatos recentes
   useEffect(() => {
     if (!user?.id || !isOpen) return;
 
     async function fetchContacts() {
       try {
-        const res = await fetch(`http://localhost:3001/api/conversations?userId=${user.id}`);
+        const res = await fetch(`${API_URL}/api/conversations?userId=${user?.id}`);
         if (res.ok) {
           const data = await res.json();
           setContacts(data);
@@ -60,14 +60,13 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
     fetchContacts();
   }, [user?.id, isOpen]);
 
-  // Polling para atualizar mensagens da conversa ativa a cada 3 segundos
   useEffect(() => {
     if (!user?.id || !selectedContact?.id || !isOpen) return;
 
     async function fetchMessages() {
       try {
         const res = await fetch(
-          `http://localhost:3001/api/messages?userId=${user?.id}&contactId=${selectedContact?.id}`
+          `${API_URL}/api/messages?userId=${user?.id}&contactId=${selectedContact?.id}`
         );
         if (res.ok) {
           const data = await res.json();
@@ -78,29 +77,25 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
       }
     }
 
-    fetchMessages(); // Busca imediata ao selecionar contato
-
-    const timer = setInterval(fetchMessages, 3000); // Polling a cada 3s
+    fetchMessages();
+    const timer = setInterval(fetchMessages, 3000);
 
     return () => clearInterval(timer);
   }, [user?.id, selectedContact?.id, isOpen]);
 
-  // Rola para o final da conversa quando chega mensagem nova
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // BLOQUEIO: Evita envio se for para si mesmo
     if (!newMessage.trim() || !user?.id || !selectedContact?.id || isSelfChat) return;
 
     const messageText = newMessage;
     setNewMessage('');
 
     try {
-      const res = await fetch('http://localhost:3001/api/messages', {
+      const res = await fetch(`${API_URL}/api/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -127,22 +122,22 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-4 rounded-full shadow-2xl transition-all cursor-pointer flex items-center justify-center"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3.5 rounded-full shadow-2xl transition-all cursor-pointer flex items-center justify-center gap-2 text-base"
         >
-          💬 Chat
+          <span>💬</span> Chat
         </button>
       )}
 
       {isOpen && (
-        <div className="w-80 md:w-96 h-[450px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+        <div className="fixed inset-x-2 bottom-2 top-16 sm:static sm:inset-auto sm:w-96 sm:h-[480px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden z-50">
           
           {/* Cabeçalho */}
-          <div className="bg-[#0d59db] text-white p-3 flex items-center justify-between shadow-md">
+          <div className="bg-[#0d59db] text-white p-3.5 flex items-center justify-between shadow-md shrink-0">
             {selectedContact ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <button
                   onClick={() => setSelectedContact(null)}
-                  className="text-xs hover:underline text-blue-200 cursor-pointer"
+                  className="text-xs hover:underline text-blue-200 cursor-pointer shrink-0 py-1 px-1"
                 >
                   ← Voltar
                 </button>
@@ -157,7 +152,7 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
                 setIsOpen(false);
                 if (onClose) onClose();
               }}
-              className="text-white hover:text-gray-200 font-bold px-2 py-0.5 rounded text-sm cursor-pointer"
+              className="text-white hover:text-gray-200 font-bold px-3 py-1 rounded text-base cursor-pointer shrink-0"
             >
               ✕
             </button>
@@ -167,7 +162,7 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
           <div className="flex-1 overflow-y-auto p-3 bg-gray-50 flex flex-col">
             {!selectedContact ? (
               contacts.length === 0 ? (
-                <div className="text-center text-gray-400 text-xs my-auto">
+                <div className="text-center text-gray-400 text-sm my-auto">
                   Nenhuma conversa iniciada.
                 </div>
               ) : (
@@ -176,23 +171,21 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
                     <div
                       key={contact.id}
                       onClick={() => setSelectedContact(contact)}
-                      className="p-3 bg-white hover:bg-blue-50 rounded-xl border border-gray-200 cursor-pointer transition-colors flex items-center gap-3"
+                      className="p-3 bg-white hover:bg-blue-50 rounded-xl border border-gray-200 cursor-pointer transition-colors flex items-center gap-3 active:bg-blue-100"
                     >
-                      <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-400 text-blue-600 font-bold flex items-center justify-center text-xs">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 border border-blue-400 text-blue-600 font-bold flex items-center justify-center text-sm shrink-0">
                         {contact.name.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-sm font-semibold text-gray-800">{contact.name}</span>
+                      <span className="text-sm font-semibold text-gray-800 truncate">{contact.name}</span>
                     </div>
                   ))}
                 </div>
               )
             ) : isSelfChat ? (
-              /* AVISO: Quando o usuário tenta abrir chat consigo mesmo */
-              <div className="text-center text-gray-500 text-xs my-auto p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="text-center text-gray-600 text-xs my-auto p-4 bg-amber-50 border border-amber-200 rounded-xl">
                 ⚠️ Você é o dono deste anúncio. Não é possível enviar mensagens para você mesmo.
               </div>
             ) : (
-              /* Mensagens Normais */
               <div className="flex-1 flex flex-col gap-2">
                 {messages.length === 0 ? (
                   <div className="text-center text-gray-400 text-xs my-auto">
@@ -204,7 +197,7 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
                     return (
                       <div
                         key={msg.id}
-                        className={`max-w-[75%] p-2.5 rounded-2xl text-xs ${
+                        className={`max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed ${
                           isMe
                             ? 'bg-blue-600 text-white self-end rounded-br-none'
                             : 'bg-gray-200 text-gray-800 self-start rounded-bl-none'
@@ -220,19 +213,19 @@ export function ChatWidget({ activeContactId = null, activeContactName = null, o
             )}
           </div>
 
-          {/* Rodapé: Escondido se for conversa própria */}
+          {/* Rodapé de Envio */}
           {selectedContact && !isSelfChat && (
-            <form onSubmit={handleSendMessage} className="p-2 bg-white border-t border-gray-200 flex gap-2">
+            <form onSubmit={handleSendMessage} className="p-2.5 bg-white border-t border-gray-200 flex gap-2 shrink-0">
               <input
                 type="text"
                 placeholder="Digite sua mensagem..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs cursor-pointer transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold px-4 py-2 rounded-xl text-sm cursor-pointer transition-colors shrink-0"
               >
                 Enviar
               </button>
