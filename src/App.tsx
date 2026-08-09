@@ -14,9 +14,6 @@ import Footer from './components/layout/Footer';
 import ChatWidget from './components/chat/ChatWidget';
 import { ChatProvider, useChat } from './components/chat/ChatContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
-
 function MainApp() {
   const { activeContact, closeChat } = useChat();
 
