@@ -5,6 +5,7 @@ interface User {
   name: string;
   email: string;
   cpf: string;
+  cep: string
 }
 
 interface AuthContextType {

@@ -32,7 +32,6 @@ export function ListingPage() {
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [cep, setCep] = useState<string>('');
-  const [freteResult, setFreteResult] = useState<string | null>(null);
   const [isBuying, setIsBuying] = useState<boolean>(false);
 
   const [freteError, setFreteError] = useState<string>('');
@@ -269,12 +268,6 @@ export function ListingPage() {
               <p className="text-xs text-gray-500 flex items-center gap-1.5 pt-1">
                 <span>📍</span> Ou você pode combinar a entrega no campus com o vendedor :)
               </p>
-
-              {freteResult && (
-                <p className="text-xs font-semibold text-emerald-600 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
-                  {freteResult}
-                </p>
-              )}
 
               {/* Renderização Condicional da Lista de Opções de Frete */}
               {opcoesFrete.length > 0 && (

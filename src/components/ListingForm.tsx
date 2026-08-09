@@ -145,7 +145,6 @@ function ListingForm(props: ListingFormProps) {
           text='É uma doação?' 
           type='checkbox'
           name='isDonation'
-          checked={isDonation}
           onChange={(e) => {
             const target = e.target as HTMLInputElement;
             setIsDonation(target.checked);

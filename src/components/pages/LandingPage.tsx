@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ListingCard, { CardProps } from '../ListingCard';
 import { categories } from './Listings';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../auth/AuthContext';
@@ -53,6 +52,12 @@ const bannerSlides = [
   }
 ];
 
+// Interface auxiliar para suportar tanto o novo formato quanto o antigo (caso necessário)
+interface ApiResponse {
+  listings: CardProps[];
+  totalPages: number;
+}
+
 export const LandingPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -101,14 +106,15 @@ export const LandingPage: React.FC = () => {
   useEffect(() => {
     fetch(`${API_URL}/api/anuncios`)
       .then((res) => res.json())
-      .then((data: CardProps[]) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setListings(data);
+      .then((data: ApiResponse | CardProps[]) => {
+        // Compatibilidade com o novo formato da API ({ listings, totalPages })
+        const items = Array.isArray(data) ? data : data?.listings;
+
+        if (Array.isArray(items) && items.length > 0) {
+          setListings(items);
         }
       })
-      .catch(() => {
-        // Se a API não responder, mantém os dados fictícios para a landing page não ficar vazia
-      });
+      .catch(() => {});
   }, []);
 
   // Transição automática do Banner Hero a cada 5 segundos

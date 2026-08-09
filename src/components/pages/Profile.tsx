@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
 import ListingCard, { CardProps } from '../ListingCard';
-import { useAuth } from '../../auth/AuthContext'; // Ajuste o caminho do import conforme seu projeto
+import { useAuth } from '../../auth/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+interface ApiResponse {
+  listings: CardProps[];
+  totalPages: number;
+}
+
 function Profile() {
-  const { user } = useAuth(); // Pega os dados do usuário logado
+  const { user } = useAuth();
   const [myListings, setMyListings] = useState<CardProps[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Função para remover o item do estado local após o DELETE bem-sucedido
   const handleDeleteSuccess = (deletedId: string | number) => {
     setMyListings((prevListings) =>
       prevListings.filter((item) => item.id !== deletedId)
     );
   };
 
-  // Busca os anúncios vinculados ao ID do usuário
   useEffect(() => {
     async function fetchMyListings() {
       if (!user?.id) return;
@@ -24,8 +27,12 @@ function Profile() {
       try {
         const response = await fetch(`${API_URL}/api/anuncios?userId=${user.id}`);
         if (response.ok) {
-          const data = await response.json();
-          setMyListings(data);
+          const data: ApiResponse | CardProps[] = await response.json();
+          
+          // Trata tanto o formato novo paginado quanto um array direto por segurança
+          const items = Array.isArray(data) ? data : data?.listings;
+          
+          setMyListings(Array.isArray(items) ? items : []);
         }
       } catch (error) {
         console.error("Erro ao buscar anúncios do usuário:", error);
@@ -47,7 +54,6 @@ function Profile() {
         
         {/* Painel Lateral - Informações Reais do Usuário */}
         <aside className="w-full md:w-80 bg-white p-6 rounded-lg border border-gray-200 h-fit shadow-sm flex flex-col items-center text-center">
-          {/* Avatar com a Inicial do Nome */}
           <div className="w-28 h-28 rounded-full overflow-hidden bg-blue-100 mb-4 border-2 border-blue-500 flex items-center justify-center">
             <span className="text-blue-600 font-bold text-3xl">
               {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -57,7 +63,6 @@ function Profile() {
           <h2 className="text-xl font-bold text-gray-800">{user.name}</h2>
           <span className="text-xs text-gray-500 mb-6">Usuário Verificado</span>
 
-          {/* Dados Pessoais do Contexto */}
           <div className="w-full flex flex-col gap-4 text-left border-t border-gray-100 pt-4 text-sm text-gray-700">
             <div>
               <span className="block text-xs font-semibold text-gray-400 uppercase">E-mail</span>
