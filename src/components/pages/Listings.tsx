@@ -25,7 +25,7 @@ function Listings({ limit, showFilters = true }: ListingsProps) {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const [fetchedListings, setFetchedListings] = useState<CardProps[]>([]);
-  const [totalPages, setTotalPages] = useState<number>(1); // 👈 Novo estado para o total de páginas
+  const [totalPages, setTotalPages] = useState<number>(1); 
   const [loading, setLoading] = useState<boolean>(true);
 
   const { state } = useLocation();
